@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:restaurantapp/model/Restaurant.dart';
 import 'package:restaurantapp/theme.dart';
+import 'package:restaurantapp/providers/restaurant_provider.dart';
 
 class DetailPage extends StatelessWidget {
   //const DeatilPage({ Key? key }) : super(key: key);
   static const routeName = '/detailpage';
 
-  final Restaurant restaurant;
+  final RestaurantList restaurant;
 
   const DetailPage({this.restaurant});
 
   @override
   Widget build(BuildContext context) {
+    var restaurantProvider = Provider.of<RestaurantProvider>(context);
     return Scaffold(
       backgroundColor: Colors.white,
       body: Padding(
@@ -21,7 +24,9 @@ class DetailPage extends StatelessWidget {
             children: [
               ClipRRect(
                   borderRadius: BorderRadius.circular(8),
-                  child: Image.network(restaurant.pictureId)),
+                  child: Image.network(
+                      'https://restaurant-api.dicoding.dev/images/medium/' +
+                          restaurant.pictureId)),
               SizedBox(
                 height: 20,
               ),
@@ -75,15 +80,36 @@ class DetailPage extends StatelessWidget {
                       height: 10,
                     ),
                     Expanded(
-                      child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: restaurant.menus.foods.length,
-                          itemBuilder: (context, index) {
-                            return Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: _buildMenuFoods(
-                                  context, restaurant.menus.foods[index].name),
-                            );
+                      child: FutureBuilder<dynamic>(
+                          future: restaurantProvider
+                              .getRestaurantDetail(restaurant.id),
+                          // restaurantProvider
+                          // .getRestaurantList(),
+                          builder: (context, snapshot) {
+                            var data = snapshot.data;
+
+                            if (snapshot.hasError) {
+                              return const Center(
+                                child: Text('An error has occurred!'),
+                              );
+                            } else if (snapshot.hasData) {
+                              return ListView.builder(
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: snapshot
+                                      .data.restaurant.menus.foods.length,
+                                  itemBuilder: (context, index) {
+                                    return Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: _buildMenuFoods(
+                                            context,
+                                            data.restaurant.menus.foods[index]
+                                                .name));
+                                  });
+                            } else {
+                              return const Center(
+                                child: CircularProgressIndicator(),
+                              );
+                            }
                           }),
                     ),
                     SizedBox(
@@ -97,15 +123,33 @@ class DetailPage extends StatelessWidget {
                       height: 10,
                     ),
                     Expanded(
-                      child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: restaurant.menus.drink.length,
-                          itemBuilder: (context, index) {
-                            return Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: _buildMenuDrinks(
-                                  context, restaurant.menus.drink[index].name),
-                            );
+                      child: FutureBuilder<dynamic>(
+                          future: restaurantProvider
+                              .getRestaurantDetail(restaurant.id),
+                          builder: (context, snapshot) {
+                            var data = snapshot.data;
+
+                            if (snapshot.hasError) {
+                              return const Center(
+                                child: Text('An error has occurred!'),
+                              );
+                            } else if (snapshot.hasData) {
+                              return ListView.builder(
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: data.restaurant.menus.drink.length,
+                                  itemBuilder: (context, index) {
+                                    return Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: _buildMenuDrinks(
+                                            context,
+                                            snapshot.data.restaurant.menus
+                                                .drink[index].name));
+                                  });
+                            } else {
+                              return const Center(
+                                child: CircularProgressIndicator(),
+                              );
+                            }
                           }),
                     ),
                     SizedBox(

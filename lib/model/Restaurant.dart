@@ -1,4 +1,51 @@
+// import 'dart:convert';
+
 import 'dart:convert';
+
+class RestaurantList {
+  String id;
+  String name;
+  String description;
+  String pictureId;
+  String city;
+  double rating;
+  // List <Menus> menus;
+
+  RestaurantList({
+    this.id,
+    this.name,
+    this.description,
+    this.pictureId,
+    this.city,
+    this.rating,
+  });
+
+  factory RestaurantList.fromJson(Map<String, dynamic> restaurant) {
+    return RestaurantList(
+      id: restaurant['id'],
+      name: restaurant['name'],
+      description: restaurant['description'],
+      pictureId: restaurant['pictureId'],
+      city: restaurant['city'],
+      rating: restaurant['rating'].toDouble(),
+    );
+  }
+}
+
+class RestaurantDetail {
+  bool error;
+  String message;
+  Restaurant restaurant;
+
+  RestaurantDetail({this.error, this.message, this.restaurant});
+
+  factory RestaurantDetail.fromJson(Map<String, dynamic> restaurant) {
+    return RestaurantDetail(
+        error: restaurant['error'],
+        message: restaurant['message'],
+        restaurant: Restaurant.fromJson(restaurant['restaurant']));
+  }
+}
 
 class Restaurant {
   String id;
@@ -19,25 +66,21 @@ class Restaurant {
       this.rating,
       this.menus});
 
-  factory Restaurant.fromJson(Map<dynamic, dynamic> restaurant) {
-   
+  factory Restaurant.fromJson(Map<String, dynamic> restaurant) {
     return Restaurant(
       id: restaurant['id'],
       name: restaurant['name'],
       description: restaurant['description'],
       pictureId: restaurant['pictureId'],
       city: restaurant['city'],
-      rating: restaurant['rating'].toDouble(),
-      // menus: dataMenus,
       menus: Menus.fromJson(restaurant['menus']),
-      //menus: null
     );
   }
 }
 
 class Menus {
-  List <Foods> foods;
-  List <Drink> drink;
+  List<Foods> foods;
+  List<Drink> drink;
 
   Menus({this.foods, this.drink});
 
@@ -46,7 +89,7 @@ class Menus {
     List<Foods> dataFoods = list.map((item) => Foods.fromJson(item)).toList();
     var list2 = menus['drinks'] as List;
     List<Drink> dataDrink = list2.map((item) => Drink.fromJson(item)).toList();
-    return Menus(drink:dataDrink, foods: dataFoods);
+    return Menus(drink: dataDrink, foods: dataFoods);
   }
 }
 
@@ -71,10 +114,11 @@ class Drink {
 }
 
 // ignore: missing_return
-List<Restaurant> parseRestaurant(dynamic json) {
-  if (json == null) {
-    return <Restaurant>[];
-  }
-  List parsed = jsonDecode(json)['restaurants'];
-  return parsed.map<Restaurant>((json) => Restaurant.fromJson(json)).toList();
-}
+// List<Restaurant> parseRestaurant(dynamic json) {
+//   if (json == null) {
+//     return <Restaurant>[];
+//   }
+//   List parsed = jsonDecode(json)['restaurants'];
+//   return parsed.map<Restaurant>((json) => Restaurant.fromJson(json)).toList();
+// }
+ 
